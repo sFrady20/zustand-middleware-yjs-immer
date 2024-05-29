@@ -1,5 +1,5 @@
 {
-  "name": "zustand-middleware-yjs",
+  "name": "@spotter-dev/zustand-middleware-yjs",
   "description": "Zustand middleware for syncing state with Yjs.",
   "license": "MIT",
   "keywords": [
@@ -17,13 +17,13 @@
     "shared-editing",
     "realtime"
   ],
-  "homepage": "https://github.com/joebobmiles/zustand-middleware-yjs",
+  "homepage": "https://github.com/walfly/zustand-middleware-yjs",
   "repository": {
     "type": "git",
-    "url": "https://github.com/joebobmiles/zustand-middleware-yjs"
+    "url": "https://github.com/walfly/zustand-middleware-yjs"
   },
   "bugs": {
-    "url": "https://github.com/joebobmiles/zustand-middleware-yjs/issues"
+    "url": "https://github.com/walfly/zustand-middleware-yjs/issues"
   },
   "author": {
     "name": "Joseph R Miles",
@@ -42,8 +42,7 @@
     "types": "./dist/index.d.ts"
   },
   "publishConfig": {
-    "registry": "https://registry.npmjs.org",
-    "access": "public"
+    "registry": "https://npm.pkg.github.com"
   },
   "scripts": {
     "test": "jest",
