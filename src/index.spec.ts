@@ -452,6 +452,94 @@ describe("Yjs middleware", () =>
     ]);
   });
 
+  it("passes the optional string transactionOrigin to document.transact calls", () =>
+  {
+    const ORIGIN_NAME = 'new-transaction-origin';
+    type Store =
+    {
+      count: number,
+      increment: () => void,
+    };
+
+    const doc1 = new Y.Doc();
+
+    let receivedOrigin: any;
+
+    doc1.on("update", (update: any, origin: any) =>
+    {
+      receivedOrigin = origin
+    });
+
+
+    const storeName = "store";
+
+    const { "getState": getStateA, } =
+      createVanilla<Store>(yjs(
+        doc1,
+        storeName,
+        (set) =>
+          ({
+            "count": 0,
+            "increment": () =>
+              set((state) =>
+                ({ "count": state.count + 1, })),
+          }),
+          ORIGIN_NAME
+      ));
+
+    expect(getStateA().count).toBe(0);
+
+    getStateA().increment();
+
+    expect(getStateA().count).toBe(1);
+    expect(receivedOrigin).toBe(ORIGIN_NAME)
+  })
+
+  it("passes the optional object to document.transact calls", () =>
+    {
+      const ORIGIN = {
+        name: 'Person 1',
+      };
+      type Store =
+      {
+        count: number,
+        increment: () => void,
+      };
+  
+      const doc1 = new Y.Doc();
+  
+      let receivedOrigin: any;
+  
+      doc1.on("update", (update: any, origin: any) =>
+      {
+        receivedOrigin = origin;
+      });
+  
+  
+      const storeName = "store";
+  
+      const { "getState": getStateA, } =
+        createVanilla<Store>(yjs(
+          doc1,
+          storeName,
+          (set) =>
+            ({
+              "count": 0,
+              "increment": () =>
+                set((state) =>
+                  ({ "count": state.count + 1, })),
+            }),
+            ORIGIN
+        ));
+  
+      expect(getStateA().count).toBe(0);
+  
+      getStateA().increment();
+  
+      expect(getStateA().count).toBe(1);
+      expect(receivedOrigin.name).toBe(ORIGIN.name)
+    })
+
   describe("When adding consecutive entries into arrays", () =>
   {
     it("Does not throw when inserting multiple scalars into arrays.", () =>

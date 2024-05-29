@@ -12,13 +12,15 @@ type Yjs = <
 >(
   doc: Y.Doc,
   name: string,
-  f: StateCreator<T, Mps, Mcs>
+  f: StateCreator<T, Mps, Mcs>,
+  transactionOrigin?: any
 ) => StateCreator<T, Mps, Mcs>;
 
 type YjsImpl = <T extends unknown>(
   doc: Y.Doc,
   name: string,
-  config: StateCreator<T, [], []>
+  config: StateCreator<T, [], []>,
+  transactionOrigin?: any
 ) => StateCreator<T, [], []>;
 
 
@@ -46,12 +48,12 @@ type YjsImpl = <T extends unknown>(
 const yjs: YjsImpl = <S extends unknown>(
   doc: Y.Doc,
   name: string,
-  config: StateCreator<S>
+  config: StateCreator<S>,
+  transactionOrigin?: any
 ): StateCreator<S> =>
 {
   // The root Y.Map that the store is written and read from.
   const map: Y.Map<any> = doc.getMap(name);
-
   // Augment the store.
   return (set, get, api) =>
   {
@@ -68,7 +70,7 @@ const yjs: YjsImpl = <S extends unknown>(
       {
         set(partial, replace);
         doc.transact(() =>
-          patchSharedType(map, get()));
+          patchSharedType(map, get()), transactionOrigin);
       },
       get,
       {
@@ -78,7 +80,7 @@ const yjs: YjsImpl = <S extends unknown>(
         {
           api.setState(partial, replace);
           doc.transact(() =>
-            patchSharedType(map, api.getState()));
+            patchSharedType(map, api.getState()), transactionOrigin);
         },
       }
     );
