@@ -8,13 +8,14 @@ import { patchSharedType, patchStore, } from "./patching";
 type Yjs = <
   T extends unknown,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
-  Mcs extends [StoreMutatorIdentifier, unknown][] = []
+  Mcs extends [StoreMutatorIdentifier, unknown][] = [],
+  O extends unknown = undefined
 >(
   doc: Y.Doc,
   name: string,
   f: StateCreator<T, Mps, Mcs>,
   transactionOrigin?: any
-) => StateCreator<T, Mps, Mcs>;
+) => StateCreator<T, Mps, Mcs, O>;
 
 type YjsImpl = <T extends unknown>(
   doc: Y.Doc,
