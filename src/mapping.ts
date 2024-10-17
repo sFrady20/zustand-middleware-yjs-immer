@@ -16,23 +16,14 @@ import * as Y from "yjs";
  * @param array The array to transform into a YArray
  * @returns A YArray.
  */
-export const arrayToYArray = (array: any[]): Y.Array<any> =>
-{
+export const arrayToYArray = (array: any[]): Y.Array<any> => {
   const yarray = new Y.Array();
 
-  array.forEach((value) =>
-  {
-    if (value instanceof Array)
-      yarray.push([ arrayToYArray(value) ]);
-
-    else if (value instanceof Object)
-      yarray.push([ objectToYMap(value) ]);
-
-    else if (typeof value === "string")
-      yarray.push([ stringToYText(value) ]);
-
-    else
-      yarray.push([ value ]);
+  array.forEach((value) => {
+    if (value instanceof Array) yarray.push([arrayToYArray(value)]);
+    else if (value instanceof Object) yarray.push([objectToYMap(value)]);
+    else if (typeof value === "string") yarray.push([stringToYText(value)]);
+    else yarray.push([value]);
   });
 
   return yarray;
@@ -74,8 +65,7 @@ export const arrayToYArray = (array: any[]): Y.Array<any> =>
  * @param yarray The YArray to convert to a plain array.
  * @returns A plain JavaScript array.
  */
-export const yArrayToArray = (yarray: Y.Array<any>): any[] =>
-  yarray.toJSON();
+export const yArrayToArray = (yarray: Y.Array<any>): any[] => yarray.toJSON();
 
 /**
  * Converts a normal JavaScript object into a YMap shared type. Any nested
@@ -93,23 +83,15 @@ export const yArrayToArray = (yarray: Y.Array<any>): any[] =>
  * @param object The object to turn into a YMap shared type.
  * @returns A YMap.
  */
-export const objectToYMap = (object: any): Y.Map<any> =>
-{
+export const objectToYMap = (object: any): Y.Map<any> => {
   const ymap = new Y.Map();
 
-  Object.entries(object).forEach(([ property, value ]) =>
-  {
-    if (value instanceof Array)
-      ymap.set(property, arrayToYArray(value));
-
-    else if (value instanceof Object)
-      ymap.set(property, objectToYMap(value));
-
+  Object.entries(object).forEach(([property, value]) => {
+    if (value instanceof Array) ymap.set(property, arrayToYArray(value));
+    else if (value instanceof Object) ymap.set(property, objectToYMap(value));
     else if (typeof value === "string")
       ymap.set(property, stringToYText(value));
-
-    else
-      ymap.set(property, value);
+    else ymap.set(property, value);
   });
 
   return ymap;
@@ -151,11 +133,8 @@ export const objectToYMap = (object: any): Y.Map<any> =>
  * @param ymap YMap to convert to a plain JavaScript object.
  * @returns A plain JavaScript object.
  */
-export const yMapToObject = (ymap: Y.Map<any>): any =>
-  ymap.toJSON();
+export const yMapToObject = (ymap: Y.Map<any>): any => ymap.toJSON();
 
-export const yTextToString = (ytext: Y.Text): string =>
-  ytext.toString();
+export const yTextToString = (ytext: Y.Text): string => ytext.toString();
 
-export const stringToYText = (string: string): Y.Text =>
-  new Y.Text(string);
+export const stringToYText = (string: string): Y.Text => new Y.Text(string);

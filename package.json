@@ -1,5 +1,5 @@
 {
-  "name": "@spotter-dev/zustand-middleware-yjs",
+  "name": "zustand-middleware-yjs-immer",
   "description": "Zustand middleware for syncing state with Yjs.",
   "license": "MIT",
   "keywords": [
@@ -17,13 +17,13 @@
     "shared-editing",
     "realtime"
   ],
-  "homepage": "https://github.com/walfly/zustand-middleware-yjs",
+  "homepage": "https://github.com/sfrady20/zustand-middleware-yjs-immer",
   "repository": {
     "type": "git",
-    "url": "https://github.com/walfly/zustand-middleware-yjs"
+    "url": "https://github.com/sfrady20/zustand-middleware-yjs-immer"
   },
   "bugs": {
-    "url": "https://github.com/walfly/zustand-middleware-yjs/issues"
+    "url": "https://github.com/sfrady20/zustand-middleware-yjs-immer/issues"
   },
   "author": {
     "name": "Joseph R Miles",
@@ -52,6 +52,7 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "immer": "^10.1.1",
     "yjs": "^13.5.11",
     "zustand": "^4.3.7"
   },
@@ -119,5 +120,8 @@
       ]
     ]
   },
+  "workspaces": [
+    "examples/*"
+  ],
   "version": "1.3.2"
 }

@@ -1,9 +1,6 @@
-import {
-  StateCreator,
-  StoreMutatorIdentifier,
-} from "zustand";
+import { StateCreator, StoreMutatorIdentifier } from "zustand";
 import * as Y from "yjs";
-import { patchSharedType, patchStore, } from "./patching";
+import { patchSharedType, patchStore } from "./patching";
 
 type Yjs = <
   T extends unknown,
@@ -23,7 +20,6 @@ type YjsImpl = <T extends unknown>(
   config: StateCreator<T, [], []>,
   transactionOrigin?: any
 ) => StateCreator<T, [], []>;
-
 
 /**
  * This function is the middleware the sets up the Zustand store to mirror state
@@ -51,13 +47,11 @@ const yjs: YjsImpl = <S extends unknown>(
   name: string,
   config: StateCreator<S>,
   transactionOrigin?: any
-): StateCreator<S> =>
-{
+): StateCreator<S> => {
   // The root Y.Map that the store is written and read from.
   const map: Y.Map<any> = doc.getMap(name);
   // Augment the store.
-  return (set, get, api) =>
-  {
+  return (set, get, api) => {
     /*
      * Capture the initial state so that we can initialize the Yjs store to the
      * same values as the initial values of the Zustand store.
@@ -67,21 +61,20 @@ const yjs: YjsImpl = <S extends unknown>(
        * Create a new set function that defers to the original and then passes
        * the new state to patchSharedType.
        */
-      (partial, replace) =>
-      {
+      (partial, replace) => {
         set(partial, replace);
-        doc.transact(() =>
-          patchSharedType(map, get()), transactionOrigin);
+        doc.transact(() => patchSharedType(map, get()), transactionOrigin);
       },
       get,
       {
         ...api,
         // Create a new setState function as we did with set.
-        "setState": (partial, replace) =>
-        {
+        setState: (partial, replace) => {
           api.setState(partial, replace);
-          doc.transact(() =>
-            patchSharedType(map, api.getState()), transactionOrigin);
+          doc.transact(
+            () => patchSharedType(map, api.getState()),
+            transactionOrigin
+          );
         },
       }
     );
@@ -91,8 +84,7 @@ const yjs: YjsImpl = <S extends unknown>(
      * Zustand store. We avoid using the Yjs enabled set to prevent unnecessary
      * ping-pong of updates.
      */
-    map.observeDeep(() =>
-    {
+    map.observeDeep(() => {
       patchStore(api, map.toJSON());
     });
 

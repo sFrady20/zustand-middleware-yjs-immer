@@ -15,6 +15,6 @@
   "dependencies": {
     "yjs": "^13.5.11",
     "zustand": "^3.5.7",
-    "zustand-middleware-yjs": "^1.2.1"
+    "zustand-middleware-yjs-immer": "^1.2.1"
   }
 }
