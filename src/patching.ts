@@ -3,6 +3,7 @@ import { ChangeType, Change } from "./types";
 import { getChanges } from "./diff";
 import { arrayToYArray, objectToYMap, stringToYText } from "./mapping";
 import { StoreApi } from "zustand/vanilla";
+import type { WithImmer } from "./types";
 
 /**
  * Diffs sharedType and newState to create a list of changes for transforming
@@ -206,7 +207,7 @@ export const patchState = (oldState: any, newState: any): any => {
  * @param newState The new state that the Zustand store should be patched to.
  */
 export const patchStore = <S extends unknown>(
-  store: StoreApi<S>,
+  store: WithImmer<StoreApi<S>>,
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   newState: any
 ): void => {

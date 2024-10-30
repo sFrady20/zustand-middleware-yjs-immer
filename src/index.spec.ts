@@ -1,15 +1,11 @@
 import { spawn, ChildProcess } from "child_process";
 import path from "path";
-
 import { act, renderHook } from "@testing-library/react-hooks";
-
 import { createStore as createVanilla } from "zustand/vanilla";
 import { create } from "zustand";
-
 import * as Y from "yjs";
 import { WebsocketProvider } from "y-websocket";
-
-import yjs from ".";
+import yjsImmer from ".";
 
 describe("Yjs middleware", () => {
   it("Creates a useState function.", () => {
@@ -18,11 +14,14 @@ describe("Yjs middleware", () => {
       increment: () => void;
     };
 
-    const { getState } = createVanilla<Store>(
-      yjs(new Y.Doc(), "hello", (set) => ({
-        count: 0,
-        increment: () => set((state) => ({ count: state.count + 1 })),
-      }))
+    const { getState } = createVanilla<Store, [["zustand/immer", unknown]]>(
+      yjsImmer(
+        (set) => ({
+          count: 0,
+          increment: () => set((state) => ({ count: state.count + 1 })),
+        }),
+        { doc: new Y.Doc(), name: "hello" }
+      )
     );
 
     expect(getState().count).toBe(0);
@@ -50,18 +49,30 @@ describe("Yjs middleware", () => {
 
     const storeName = "store";
 
-    const { getState: getStateA } = createVanilla<Store>(
-      yjs(doc1, storeName, (set) => ({
-        count: 0,
-        increment: () => set((state) => ({ count: state.count + 1 })),
-      }))
+    const { getState: getStateA } = createVanilla<
+      Store,
+      [["zustand/immer", unknown]]
+    >(
+      yjsImmer(
+        (set) => ({
+          count: 0,
+          increment: () => set((state) => ({ count: state.count + 1 })),
+        }),
+        { doc: doc1, name: storeName }
+      )
     );
 
-    const { getState: getStateB } = createVanilla<Store>(
-      yjs(doc2, storeName, (set) => ({
-        count: 0,
-        increment: () => set((state) => ({ count: state.count + 1 })),
-      }))
+    const { getState: getStateB } = createVanilla<
+      Store,
+      [["zustand/immer", unknown]]
+    >(
+      yjsImmer(
+        (set) => ({
+          count: 0,
+          increment: () => set((state) => ({ count: state.count + 1 })),
+        }),
+        { doc: doc2, name: storeName }
+      )
     );
 
     expect(getStateA().count).toBe(0);
@@ -93,30 +104,42 @@ describe("Yjs middleware", () => {
 
     const storeName = "store";
 
-    const { getState: getStateA } = createVanilla<Store>(
-      yjs(doc1, storeName, (set) => ({
-        person: {
-          age: 0,
-          name: "Joe",
-        },
-        getOlder: () =>
-          set((state) => ({
-            person: { ...state.person, age: state.person.age + 1 },
-          })),
-      }))
+    const { getState: getStateA } = createVanilla<
+      Store,
+      [["zustand/immer", unknown]]
+    >(
+      yjsImmer(
+        (set) => ({
+          person: {
+            age: 0,
+            name: "Joe",
+          },
+          getOlder: () =>
+            set((state) => ({
+              person: { ...state.person, age: state.person.age + 1 },
+            })),
+        }),
+        { doc: doc1, name: storeName }
+      )
     );
 
-    const { getState: getStateB } = createVanilla<Store>(
-      yjs(doc2, storeName, (set) => ({
-        person: {
-          age: 0,
-          name: "Joe",
-        },
-        getOlder: () =>
-          set((state) => ({
-            person: { ...state.person, age: state.person.age + 1 },
-          })),
-      }))
+    const { getState: getStateB } = createVanilla<
+      Store,
+      [["zustand/immer", unknown]]
+    >(
+      yjsImmer(
+        (set) => ({
+          person: {
+            age: 0,
+            name: "Joe",
+          },
+          getOlder: () =>
+            set((state) => ({
+              person: { ...state.person, age: state.person.age + 1 },
+            })),
+        }),
+        { doc: doc2, name: storeName }
+      )
     );
 
     expect(getStateA().person.age).toBe(0);
@@ -151,45 +174,63 @@ describe("Yjs middleware", () => {
 
     const storeName = "store";
 
-    const { getState: getStateA } = createVanilla<Store>(
-      yjs(doc1, storeName, (set) => ({
-        owner: {
-          person: {
-            age: 0,
-            name: "Joe",
-          },
-        },
-        getOlder: () =>
-          set((state) => ({
-            owner: {
-              ...state.owner,
-              person: {
-                ...state.owner.person,
-                age: state.owner.person.age + 1,
-              },
+    const { getState: getStateA } = createVanilla<
+      Store,
+      [["zustand/immer", unknown]]
+    >(
+      yjsImmer(
+        (set) => ({
+          owner: {
+            person: {
+              age: 0,
+              name: "Joe",
             },
-          })),
-      }))
+          },
+          getOlder: () =>
+            set((state) => ({
+              owner: {
+                ...state.owner,
+                person: {
+                  ...state.owner.person,
+                  age: state.owner.person.age + 1,
+                },
+              },
+            })),
+        }),
+        {
+          doc: doc1,
+          name: storeName,
+        }
+      )
     );
-    const { getState: getStateB } = createVanilla<Store>(
-      yjs(doc1, storeName, (set) => ({
-        owner: {
-          person: {
-            age: 0,
-            name: "Joe",
-          },
-        },
-        getOlder: () =>
-          set((state) => ({
-            owner: {
-              ...state.owner,
-              person: {
-                ...state.owner.person,
-                age: state.owner.person.age + 1,
-              },
+    const { getState: getStateB } = createVanilla<
+      Store,
+      [["zustand/immer", unknown]]
+    >(
+      yjsImmer(
+        (set) => ({
+          owner: {
+            person: {
+              age: 0,
+              name: "Joe",
             },
-          })),
-      }))
+          },
+          getOlder: () =>
+            set((state) => ({
+              owner: {
+                ...state.owner,
+                person: {
+                  ...state.owner.person,
+                  age: state.owner.person.age + 1,
+                },
+              },
+            })),
+        }),
+        {
+          doc: doc1,
+          name: storeName,
+        }
+      )
     );
 
     expect(getStateA().owner.person.age).toBe(0);
@@ -221,34 +262,52 @@ describe("Yjs middleware", () => {
 
     const storeName = "store";
 
-    const { getState: getStateA } = createVanilla<Store>(
-      yjs(doc1, storeName, (set) => ({
-        room: {
-          users: ["amy", "sam", "harold"],
-        },
-        join: (user) =>
-          set((state) => ({
-            room: {
-              ...state.room,
-              users: [...state.room.users, user],
-            },
-          })),
-      }))
+    const { getState: getStateA } = createVanilla<
+      Store,
+      [["zustand/immer", unknown]]
+    >(
+      yjsImmer(
+        (set) => ({
+          room: {
+            users: ["amy", "sam", "harold"],
+          },
+          join: (user) =>
+            set((state) => ({
+              room: {
+                ...state.room,
+                users: [...state.room.users, user],
+              },
+            })),
+        }),
+        {
+          doc: doc1,
+          name: storeName,
+        }
+      )
     );
 
-    const { getState: getStateB } = createVanilla<Store>(
-      yjs(doc1, storeName, (set) => ({
-        room: {
-          users: ["amy", "sam", "harold"],
-        },
-        join: (user) =>
-          set((state) => ({
-            room: {
-              ...state.room,
-              users: [...state.room.users, user],
-            },
-          })),
-      }))
+    const { getState: getStateB } = createVanilla<
+      Store,
+      [["zustand/immer", unknown]]
+    >(
+      yjsImmer(
+        (set) => ({
+          room: {
+            users: ["amy", "sam", "harold"],
+          },
+          join: (user) =>
+            set((state) => ({
+              room: {
+                ...state.room,
+                users: [...state.room.users, user],
+              },
+            })),
+        }),
+        {
+          doc: doc1,
+          name: storeName,
+        }
+      )
     );
 
     expect(getStateA().room.users).toEqual(["amy", "sam", "harold"]);
@@ -278,58 +337,76 @@ describe("Yjs middleware", () => {
 
     const storeName = "store";
 
-    const { getState: getStateA } = createVanilla<Store>(
-      yjs(doc1, storeName, (set) => ({
-        users: [
-          {
-            name: "alice",
-            status: "offline",
+    const { getState: getStateA } = createVanilla<
+      Store,
+      [["zustand/immer", unknown]]
+    >(
+      yjsImmer(
+        (set) => ({
+          users: [
+            {
+              name: "alice",
+              status: "offline",
+            },
+            {
+              name: "bob",
+              status: "offline",
+            },
+          ],
+          setStatus: (userName, status) => {
+            set((state) => ({
+              ...state,
+              users: [
+                ...state.users.filter(({ name }) => name !== userName),
+                {
+                  name: userName,
+                  status: status,
+                },
+              ],
+            }));
           },
-          {
-            name: "bob",
-            status: "offline",
-          },
-        ],
-        setStatus: (userName, status) => {
-          set((state) => ({
-            ...state,
-            users: [
-              ...state.users.filter(({ name }) => name !== userName),
-              {
-                name: userName,
-                status: status,
-              },
-            ],
-          }));
-        },
-      }))
+        }),
+        {
+          doc: doc1,
+          name: storeName,
+        }
+      )
     );
 
-    const { getState: getStateB } = createVanilla<Store>(
-      yjs(doc1, storeName, (set) => ({
-        users: [
-          {
-            name: "alice",
-            status: "offline",
+    const { getState: getStateB } = createVanilla<
+      Store,
+      [["zustand/immer", unknown]]
+    >(
+      yjsImmer(
+        (set) => ({
+          users: [
+            {
+              name: "alice",
+              status: "offline",
+            },
+            {
+              name: "bob",
+              status: "offline",
+            },
+          ],
+          setStatus: (userName, status) => {
+            set((state) => ({
+              ...state,
+              users: [
+                ...state.users.filter(({ name }) => name !== userName),
+                {
+                  name: userName,
+                  status: status,
+                },
+              ],
+            }));
           },
-          {
-            name: "bob",
-            status: "offline",
-          },
-        ],
-        setStatus: (userName, status) => {
-          set((state) => ({
-            ...state,
-            users: [
-              ...state.users.filter(({ name }) => name !== userName),
-              {
-                name: userName,
-                status: status,
-              },
-            ],
-          }));
-        },
-      }))
+        }),
+        {
+          doc: doc1,
+          name: storeName,
+        }
+      )
     );
 
     expect(getStateA().users).toEqual([
@@ -370,15 +447,20 @@ describe("Yjs middleware", () => {
 
     const storeName = "store";
 
-    const { getState: getStateA } = createVanilla<Store>(
-      yjs(
-        doc1,
-        storeName,
+    const { getState: getStateA } = createVanilla<
+      Store,
+      [["zustand/immer", unknown]]
+    >(
+      yjsImmer(
         (set) => ({
           count: 0,
           increment: () => set((state) => ({ count: state.count + 1 })),
         }),
-        ORIGIN_NAME
+        {
+          doc: doc1,
+          name: storeName,
+          transactionOrigin: ORIGIN_NAME,
+        }
       )
     );
 
@@ -409,15 +491,20 @@ describe("Yjs middleware", () => {
 
     const storeName = "store";
 
-    const { getState: getStateA } = createVanilla<Store>(
-      yjs(
-        doc1,
-        storeName,
+    const { getState: getStateA } = createVanilla<
+      Store,
+      [["zustand/immer", unknown]]
+    >(
+      yjsImmer(
         (set) => ({
           count: 0,
           increment: () => set((state) => ({ count: state.count + 1 })),
         }),
-        ORIGIN
+        {
+          doc: doc1,
+          name: storeName,
+          transactionOrigin: ORIGIN,
+        }
       )
     );
 
@@ -438,14 +525,20 @@ describe("Yjs middleware", () => {
 
       const doc = new Y.Doc();
 
-      const api = createVanilla<Store>(
-        yjs(doc, "hello", (set) => ({
-          numbers: [],
-          addNumber: (n) =>
-            set((state) => ({
-              numbers: [...state.numbers, n],
-            })),
-        }))
+      const api = createVanilla<Store, [["zustand/immer", unknown]]>(
+        yjsImmer(
+          (set) => ({
+            numbers: [],
+            addNumber: (n) =>
+              set((state) => ({
+                numbers: [...state.numbers, n],
+              })),
+          }),
+          {
+            doc: doc,
+            name: "hello",
+          }
+        )
       );
 
       expect(api.getState().numbers).toEqual([]);
@@ -464,14 +557,20 @@ describe("Yjs middleware", () => {
 
       const doc = new Y.Doc();
 
-      const api = createVanilla<Store>(
-        yjs(doc, "hello", (set) => ({
-          arrays: [],
-          addArray: (array) =>
-            set((state) => ({
-              arrays: [...state.arrays, array],
-            })),
-        }))
+      const api = createVanilla<Store, [["zustand/immer", unknown]]>(
+        yjsImmer(
+          (set) => ({
+            arrays: [],
+            addArray: (array) =>
+              set((state) => ({
+                arrays: [...state.arrays, array],
+              })),
+          }),
+          {
+            doc: doc,
+            name: "hello",
+          }
+        )
       );
 
       expect(api.getState().arrays).toEqual([]);
@@ -490,20 +589,26 @@ describe("Yjs middleware", () => {
 
       const doc = new Y.Doc();
 
-      const api = createVanilla<Store>(
-        yjs(doc, "hello", (set) => ({
-          users: <{ name: string; status: "online" | "offline" }[]>[],
-          addUser: (name, status) =>
-            set((state) => ({
-              users: [
-                ...state.users,
-                {
-                  name: name,
-                  status: status,
-                },
-              ],
-            })),
-        }))
+      const api = createVanilla<Store, [["zustand/immer", unknown]]>(
+        yjsImmer(
+          (set) => ({
+            users: <{ name: string; status: "online" | "offline" }[]>[],
+            addUser: (name, status) =>
+              set((state) => ({
+                users: [
+                  ...state.users,
+                  {
+                    name: name,
+                    status: status,
+                  },
+                ],
+              })),
+          }),
+          {
+            doc: doc,
+            name: "hello",
+          }
+        )
       );
 
       expect(api.getState().users).toEqual([]);
@@ -529,24 +634,30 @@ describe("Yjs middleware", () => {
 
       const doc = new Y.Doc();
 
-      const api = createVanilla<Store>(
-        yjs(doc, "hello", (set) => ({
-          count: 0,
-          columns: [],
-          increment: () =>
-            set((state) => ({
-              ...state,
-              count: state.count + 1,
-            })),
-          setColumns: (object: Record<string, any>) =>
-            set({
-              columns: [{ dataObject: [object] }],
-            }),
-          removeColumns: () =>
-            set({
-              columns: [{ dataObject: undefined }],
-            }),
-        }))
+      const api = createVanilla<Store, [["zustand/immer", unknown]]>(
+        yjsImmer(
+          (set) => ({
+            count: 0,
+            columns: [],
+            increment: () =>
+              set((state) => ({
+                ...state,
+                count: state.count + 1,
+              })),
+            setColumns: (object: Record<string, any>) =>
+              set({
+                columns: [{ dataObject: [object] }],
+              }),
+            removeColumns: () =>
+              set({
+                columns: [{ dataObject: undefined }],
+              }),
+          }),
+          {
+            doc: doc,
+            name: "hello",
+          }
+        )
       );
 
       expect(() => {
@@ -567,14 +678,20 @@ describe("Yjs middleware", () => {
 
       const doc = new Y.Doc();
 
-      const api = createVanilla<Store>(
-        yjs(doc, "hello", (set) => ({
-          foo: {
-            bar: "baz",
-          },
-          updateFoo: (s: string) =>
-            set((state) => ({ ...state, foo: { bar: s } })),
-        }))
+      const api = createVanilla<Store, [["zustand/immer", unknown]]>(
+        yjsImmer(
+          (set) => ({
+            foo: {
+              bar: "baz",
+            },
+            updateFoo: (s: string) =>
+              set((state) => ({ ...state, foo: { bar: s } })),
+          }),
+          {
+            doc: doc,
+            name: "hello",
+          }
+        )
       );
 
       expect(() => {
@@ -638,11 +755,17 @@ describe("Yjs middleware with network provider", () => {
     const provider1 = new WebsocketProvider(address, roomName, doc1, {
       WebSocketPolyfill: require("ws"),
     });
-    const store1 = createVanilla<State>(
-      yjs(doc1, mapName, (set) => ({
-        count: 0,
-        increment: () => set((state) => ({ count: state.count + 1 })),
-      }))
+    const store1 = createVanilla<State, [["zustand/immer", unknown]]>(
+      yjsImmer(
+        (set) => ({
+          count: 0,
+          increment: () => set((state) => ({ count: state.count + 1 })),
+        }),
+        {
+          doc: doc1,
+          name: mapName,
+        }
+      )
     );
 
     await waitForProviderToConnect(provider1);
@@ -655,11 +778,17 @@ describe("Yjs middleware with network provider", () => {
     const provider2 = new WebsocketProvider(address, roomName, doc2, {
       WebSocketPolyfill: require("ws"),
     });
-    const store2 = createVanilla<State>(
-      yjs(doc2, mapName, (set) => ({
-        count: 0,
-        increment: () => set((state) => ({ count: state.count + 1 })),
-      }))
+    const store2 = createVanilla<State, [["zustand/immer", unknown]]>(
+      yjsImmer(
+        (set) => ({
+          count: 0,
+          increment: () => set((state) => ({ count: state.count + 1 })),
+        }),
+        {
+          doc: doc2,
+          name: mapName,
+        }
+      )
     );
 
     await waitForProviderToConnect(provider2);
@@ -692,14 +821,20 @@ describe("Yjs middleware in React", () => {
 
     const doc = new Y.Doc();
 
-    const useStore = create<Store>(
-      yjs(doc, "hello", (set) => ({
-        count: 0,
-        increment: () => set((state) => ({ count: state.count + 1 })),
-        someOtherData: {
-          foo: () => "bar",
-        },
-      }))
+    const useStore = create<Store, [["zustand/immer", unknown]]>(
+      yjsImmer(
+        (set) => ({
+          count: 0,
+          increment: () => set((state) => ({ count: state.count + 1 })),
+          someOtherData: {
+            foo: () => "bar",
+          },
+        }),
+        {
+          doc: doc,
+          name: "hello",
+        }
+      )
     );
 
     const { result } = renderHook(() =>
@@ -730,25 +865,46 @@ describe("Yjs middleware in React", () => {
     const doc2 = new Y.Doc();
 
     doc1.on("update", (update: any) => {
+      const before = doc2.getMap("hello").get("count");
       Y.applyUpdate(doc2, update);
+      const after = doc2.getMap("hello").get("count");
+      console.log("updating doc2", before, after);
     });
 
     doc2.on("update", (update: any) => {
+      const before = doc1.getMap("hello").get("count");
       Y.applyUpdate(doc1, update);
+      const after = doc1.getMap("hello").get("count");
+      console.log("updating doc1", before, after);
     });
 
-    const useStore1 = create<Store>(
-      yjs(doc1, "hello", (set) => ({
-        count: 0,
-        increment: () => set((state) => ({ count: state.count + 1 })),
-      }))
+    const useStore1 = create<Store, [["zustand/immer", unknown]]>(
+      yjsImmer(
+        (set) => ({
+          count: 0,
+          increment: () => set((state) => ({ count: state.count + 1 })),
+        }),
+        {
+          doc: doc1,
+          name: "hello",
+        }
+      )
     );
 
-    const useStore2 = create<Store>(
-      yjs(doc2, "hello", (set) => ({
-        count: 0,
-        increment: () => set((state) => ({ count: state.count + 1 })),
-      }))
+    const useStore2 = create<Store, [["zustand/immer", unknown]]>(
+      yjsImmer(
+        (set) => ({
+          count: 0,
+          increment: () =>
+            set((state) => {
+              state.count += 1;
+            }),
+        }),
+        {
+          doc: doc2,
+          name: "hello",
+        }
+      )
     );
 
     const { result: result1 } = renderHook(() =>
@@ -766,6 +922,7 @@ describe("Yjs middleware in React", () => {
     );
 
     act(() => {
+      console.log("calling increment");
       result1.current.increment();
     });
 
