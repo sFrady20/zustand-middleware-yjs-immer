@@ -20,7 +20,7 @@
   "homepage": "https://github.com/sfrady20/zustand-middleware-yjs-immer",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sfrady20/zustand-middleware-yjs-immer"
+    "url": "git+https://github.com/sfrady20/zustand-middleware-yjs-immer.git"
   },
   "bugs": {
     "url": "https://github.com/sfrady20/zustand-middleware-yjs-immer/issues"
@@ -40,9 +40,6 @@
     "require": "./dist/yjs.cjs",
     "import": "./dist/yjs.mjs",
     "types": "./dist/index.d.ts"
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
   },
   "scripts": {
     "test": "jest",
@@ -114,5 +111,5 @@
   "workspaces": [
     "examples/*"
   ],
-  "version": "0.0.1"
+  "version": "0.0.2"
 }

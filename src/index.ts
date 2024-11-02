@@ -10,7 +10,7 @@ type Options<T> = {
 export type ImmerStateCreator<T> = ReturnType<typeof immer<T>>;
 export type ImmerStoreApi<T> = Parameters<Parameters<typeof immer<T>>[0]>[2];
 
-export const yjsImmer = <S extends unknown>(
+const yjsImmer = <S extends unknown>(
   config: ImmerStateCreator<S>,
   options: Options<S>
 ): ImmerStateCreator<S> => {
@@ -35,3 +35,5 @@ export const yjsImmer = <S extends unknown>(
     return initialState;
   };
 };
+
+export default yjsImmer;
